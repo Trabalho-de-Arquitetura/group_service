@@ -1,0 +1,34 @@
+# Estende o tipo User, indicando que ele é definido em outro serviço.
+# O Group service só precisa saber a chave (@key) e os campos que ele mesmo adiciona ou usa (@external).
+# Como GroupService não adiciona campos a User, mas referencia Users, precisamos de um stub de User.
+# A diretiva @extends é usada quando você está adicionando campos a um tipo federado
+# definido em outro serviço. Se você está apenas *referenciando* o tipo,
+# você define o tipo com sua chave, e o gateway faz a junção.
+
+type User @key(fields: "id") @extends {
+    id: ID! @external # id é definido externamente (no User Service)
+}
+
+type Group @key(fields: "id") {
+    id: ID!
+    name: String!
+    availableForProjects: Boolean!
+    coordinator: User! # Referencia ao tipo User (será resolvido pelo User Service via federation)
+    students: [User!] # Lista de Users (será resolvida pelo User Service via federation)
+}
+
+type Query {
+    groupById(id: ID!): Group
+    allGroups: [Group]
+}
+
+input CreateGroupInput {
+    name: String!
+    availableForProjects: Boolean!
+    coordinatorId: ID! # Passamos o ID do User
+    studentIds: [ID!]  # Passamos a lista de IDs de User
+}
+
+type Mutation {
+    createGroup(input: CreateGroupInput!): Group
+}
