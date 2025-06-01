@@ -33,6 +33,7 @@ public class GraphQLFederationConfig {
                 // Este é o resolver que o gateway chamará para buscar Users por ID
                 .type("Query", builder -> builder.dataFetcher("_entities", env -> {
                     List<Map<String, Object>> representations = env.getArgument("representations");
+                    assert representations != null;
                     return representations.stream()
                             .map(representation -> {
                                 if ("Group".equals(representation.get("__typename"))) {
