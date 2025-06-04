@@ -49,20 +49,18 @@ public class GroupController {
     // Retorna um objeto User (stub) contendo apenas o ID.
     // O Gateway usará esse ID para buscar o User completo do UserService.
     @SchemaMapping(typeName = "Group", field = "coordinator")
-    public User coordinator(Group group) {
-        return new User(group.getCoordinatorId());
+    public UUID coordinator(Group group) {
+        return new User(group.getCoordinatorId()).getId();
     }
 
     // Resolver para o campo 'students' do tipo 'Group'.
     // Retorna uma lista de User (stubs) contendo apenas os IDs.
     @SchemaMapping(typeName = "Group", field = "students")
-    public List<User> students(Group group) {
+    public List<UUID> students(Group group) {
         if (group.getStudentIds() == null) {
             return List.of();
         }
-        return group.getStudentIds().stream()
-                .map(User::new) // Cria um User stub para cada ID
-                .collect(Collectors.toList());
+        return group.getStudentIds();
     }
 
     @SchemaMapping(typeName = "Group", field = "id")
