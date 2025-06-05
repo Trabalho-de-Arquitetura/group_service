@@ -1,7 +1,6 @@
 package com.group_service.controller;
 
 import com.group_service.dto.CreateGroupInput;
-import com.group_service.dto.GroupDTO;
 import com.group_service.dto.UpdateGroupInput;
 import com.group_service.dto.User;
 import com.group_service.entity.Group;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Controller;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Controller
 public class GroupController {
@@ -35,16 +33,8 @@ public class GroupController {
         return groupRepository.findAllById(id);
     }
     @QueryMapping
-    public List<GroupDTO> findAllGroups() {
-        return groupRepository.findAll().stream()
-                .map(group -> new GroupDTO(
-                        group.getId(),
-                        group.getName(),
-                        group.isAvailableForProjects(),
-                        new User(group.getCoordinator()),
-                        group.getStudents().stream().map(User::new).toList()
-                ))
-                .toList();
+    public List<Group> findAllGroups() {
+        return groupRepository.findAll();
     }
 
     @QueryMapping
@@ -63,21 +53,14 @@ public class GroupController {
     }
 
     @MutationMapping
-    public GroupDTO saveGroup(@Argument CreateGroupInput input) {
+    public Group saveGroup(@Argument CreateGroupInput input) {
         Group group = new Group();
         group.setName(input.name);
         group.setAvailableForProjects(input.availableForProjects);
         group.setCoordinator(input.coordinatorId);
         group.setStudents(input.studentIds);
 
-        Group savedGroup = groupRepository.save(group);
-        return new GroupDTO(
-                savedGroup.getId(),
-                savedGroup.getName(),
-                savedGroup.isAvailableForProjects(),
-                new User(savedGroup.getCoordinator()),
-                savedGroup.getStudents().stream().map(User::new).toList()
-        );
+        return groupRepository.save(group);
     }
     @MutationMapping
     public Group updateGroup(@Argument UpdateGroupInput input) {

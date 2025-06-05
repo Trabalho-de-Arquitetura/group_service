@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class UpdateGroupInput {
+
     public UUID id;
     public String name;
     public Boolean availableForProjects;
@@ -17,6 +18,14 @@ public class UpdateGroupInput {
         this.availableForProjects = availableForProjects;
         this.coordinatorId = coordinatorId;
         this.studentIds = studentIds;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     public String getName() {
