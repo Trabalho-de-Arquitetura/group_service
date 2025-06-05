@@ -130,15 +130,7 @@ public class GroupController {
     }
 
     @SchemaMapping(typeName = "GroupDTO", field= "id")
-    public GroupDTO __resolveReference(GroupDTO groupDTO) {
-        return groupRepository.findById(groupDTO.getId())
-                .map(group -> new GroupDTO(
-                        group.getId(),
-                        group.getName(),
-                        group.isAvailableForProjects(),
-                        new User(group.getCoordinatorId()),
-                        group.getStudentIds().stream().map(User::new).collect(Collectors.toList())
-                ))
-                .orElseThrow(() -> new IllegalStateException("Group not found for ID: " + groupDTO.getId()));
+    public UUID __resolveReference(GroupDTO groupDTO) {
+        return groupRepository.findById(groupDTO.getId()).get().getId();
     }
 }
