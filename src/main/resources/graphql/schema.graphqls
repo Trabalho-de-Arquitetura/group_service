@@ -5,30 +5,44 @@
 # definido em outro serviço. Se você está apenas *referenciando* o tipo,
 # você define o tipo com sua chave, e o gateway faz a junção.
 
-type User @key(fields: "id") @extends {
-    id: ID! @external # id é definido externamente (no User Service)
+type UserDTO @key(fields: "id") @extends {
+    id: ID @external # Change from ID! to ID
 }
 
-type Group @key(fields: "id") {
+type GroupDTO @key(fields: "id") {
     id: ID!
     name: String!
     availableForProjects: Boolean!
-    coordinator: User! # Referencia ao tipo User (será resolvido pelo User Service via federation)
-    students: [User!] # Lista de Users (será resolvida pelo User Service via federation)
+    coordinator: UserDTO!
+    students: [UserDTO!]
 }
 
 type Query {
-    groupById(id: ID!): Group
-    allGroups: [Group]
+    groupById(id: ID!): GroupDTO
+    findAllGroupsById(id: [ID!]!): [GroupDTO!]!
+    findAllGroups: [GroupDTO!]!
+    findAllGroupsByNameIn(names: [String!]!): [GroupDTO!]!
+    findAllGroupByCoordinator(coordinator_id: ID!): [GroupDTO!]!
+    findAllGroupsByStudentId(student_id: ID!): [GroupDTO!]
 }
 
 input CreateGroupInput {
     name: String!
     availableForProjects: Boolean!
-    coordinatorId: ID! # Passamos o ID do User
-    studentIds: [ID!]  # Passamos a lista de IDs de User
+    coordinatorId: ID!
+    studentIds: [ID!]
+}
+
+input UpdateGroupInput {
+    id: ID!
+    name: String
+    availableForProjects: Boolean
+    coordinatorId: ID
+    studentIds: [ID!]
 }
 
 type Mutation {
-    createGroup(input: CreateGroupInput!): Group
+    saveGroup(input: CreateGroupInput!): GroupDTO!
+    updateGroup(input: UpdateGroupInput!): GroupDTO!
+    deleteGroup(id: ID!): GroupDTO!
 }
