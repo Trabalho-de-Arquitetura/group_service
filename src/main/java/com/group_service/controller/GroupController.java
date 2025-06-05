@@ -92,8 +92,11 @@ public class GroupController {
     // Retorna um objeto User (stub) contendo apenas o ID.
     // O Gateway usará esse ID para buscar o User completo do UserService.
     @SchemaMapping(typeName = "GroupDTO", field = "coordinator")
-    public UUID coordinator(Group group) {
-        return new User(group.getCoordinatorId()).getId();
+    public User coordinator(Group group) {
+        if (group.getCoordinatorId() == null) {
+            throw new IllegalStateException("Coordinator ID is null for group: " + group.getId());
+        }
+        return new User(group.getCoordinatorId());
     }
 
     // Resolver para o campo 'students' do tipo 'Group'.

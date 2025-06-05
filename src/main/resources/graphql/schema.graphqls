@@ -6,7 +6,7 @@
 # você define o tipo com sua chave, e o gateway faz a junção.
 
 type UserDTO @key(fields: "id") @extends {
-    id: ID! @external # id é definido externamente (no User Service)
+    id: ID @external # Change from ID! to ID
 }
 
 type GroupDTO @key(fields: "id") {
