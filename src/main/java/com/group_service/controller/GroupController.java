@@ -61,7 +61,10 @@ public class GroupController {
         group.setAvailableForProjects(input.availableForProjects);
         group.setCoordinatorId(input.coordinatorId);
         group.setStudentIds(input.studentIds);
-        return groupRepository.save(group);
+
+        Group savedGroup = groupRepository.save(group);
+        System.out.println("Group saved: " + savedGroup.getId() + ", Name: " + savedGroup.getName());
+        return savedGroup;
     }
     @MutationMapping
     public Group updateGroup(@Argument UpdateGroupInput input) {
