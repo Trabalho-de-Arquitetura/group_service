@@ -19,20 +19,20 @@ public class Group {
     private boolean availableForProjects;
 
     @Column(name = "coordinator_id", nullable = false)
-    private UUID coordinatorId; // Armazena o ID do User coordenador
+    private UUID coordinator; // Armazena o ID do User coordenador
 
     @ElementCollection(fetch = FetchType.EAGER) // EAGER para simplicidade, considere LAZY
     @CollectionTable(name = "group_students", joinColumns = @JoinColumn(name = "group_id"))
     @Column(name = "student_id")
-    private List<UUID> studentIds; // Armazena IDs dos User estudantes
+    private List<UUID> students; // Armazena IDs dos User estudantes
 
     public Group() {}
 
-    public Group(String name, boolean availableForProjects, UUID coordinatorId, List<UUID> studentIds) {
+    public Group(String name, boolean availableForProjects, UUID coordinator, List<UUID> students) {
         this.name = name;
         this.availableForProjects = availableForProjects;
-        this.coordinatorId = coordinatorId;
-        this.studentIds = studentIds;
+        this.coordinator = coordinator;
+        this.students = students;
     }
 
     public UUID getId() { return id; }
@@ -41,8 +41,8 @@ public class Group {
     public void setName(String name) { this.name = name; }
     public boolean isAvailableForProjects() { return availableForProjects; }
     public void setAvailableForProjects(boolean availableForProjects) { this.availableForProjects = availableForProjects; }
-    public UUID getCoordinatorId() { return coordinatorId; }
-    public void setCoordinatorId(UUID coordinatorId) { this.coordinatorId = coordinatorId; }
-    public List<UUID> getStudentIds() { return studentIds; }
-    public void setStudentIds(List<UUID> studentIds) { this.studentIds = studentIds; }
+    public UUID getCoordinator() { return coordinator; }
+    public void setCoordinator(UUID coordinatorId) { this.coordinator = coordinatorId; }
+    public List<UUID> getStudents() { return students; }
+    public void setStudents(List<UUID> studentIds) { this.students = studentIds; }
 }

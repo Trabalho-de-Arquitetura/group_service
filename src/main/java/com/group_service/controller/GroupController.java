@@ -6,7 +6,6 @@ import com.group_service.dto.UpdateGroupInput;
 import com.group_service.dto.User;
 import com.group_service.entity.Group;
 import com.group_service.repository.GroupRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -32,8 +31,8 @@ public class GroupController {
         return groupRepository.findById(id).orElse(null);
     }
     @QueryMapping
-    public Group findAllGroupsById(@Argument List<UUID> id) {
-        return groupRepository.findAllById(id).stream().findFirst().orElse(null);
+    public List<Group> findAllGroupsById(@Argument List<UUID> id) {
+        return groupRepository.findAllById(id);
     }
     @QueryMapping
     public List<GroupDTO> findAllGroups() {
@@ -42,8 +41,8 @@ public class GroupController {
                         group.getId(),
                         group.getName(),
                         group.isAvailableForProjects(),
-                        new User(group.getCoordinatorId()),
-                        group.getStudentIds().stream().map(User::new).toList()
+                        new User(group.getCoordinator()),
+                        group.getStudents().stream().map(User::new).toList()
                 ))
                 .toList();
     }
@@ -68,16 +67,16 @@ public class GroupController {
         Group group = new Group();
         group.setName(input.name);
         group.setAvailableForProjects(input.availableForProjects);
-        group.setCoordinatorId(input.coordinatorId);
-        group.setStudentIds(input.studentIds);
+        group.setCoordinator(input.coordinatorId);
+        group.setStudents(input.studentIds);
 
         Group savedGroup = groupRepository.save(group);
         return new GroupDTO(
                 savedGroup.getId(),
                 savedGroup.getName(),
                 savedGroup.isAvailableForProjects(),
-                new User(savedGroup.getCoordinatorId()),
-                savedGroup.getStudentIds().stream().map(User::new).toList()
+                new User(savedGroup.getCoordinator()),
+                savedGroup.getStudents().stream().map(User::new).toList()
         );
     }
     @MutationMapping
@@ -89,11 +88,11 @@ public class GroupController {
         if (input.availableForProjects != null)
             group.setAvailableForProjects(input.availableForProjects);
         if (input.coordinatorId != null)
-            group.setCoordinatorId(input.coordinatorId);
+            group.setCoordinator(input.coordinatorId);
         if (input.studentIds != null)
-            group.setStudentIds(input.studentIds);
+            group.setStudents(input.studentIds);
         else
-            group.setStudentIds(List.of());
+            group.setStudents(List.of());
 
         return groupRepository.save(group);
     }
@@ -109,27 +108,28 @@ public class GroupController {
     // Retorna um objeto User (stub) contendo apenas o ID.
     // O Gateway usará esse ID para buscar o User completo do UserService.
     @SchemaMapping(typeName = "GroupDTO", field = "coordinator")
-    public User coordinator(GroupDTO groupDTO) {
-        if (groupDTO.getCoordinator() == null) {
-            throw new IllegalStateException("Coordinator ID is null for group: " + groupDTO.getId());
+    public User coordinator(Group group) {
+        if (group.getCoordinator() == null) {
+            throw new IllegalStateException("Coordinator ID is null for group: " + group.getId());
         }
-        return new User(groupDTO.getCoordinator().getId());
+        return new User(group.getCoordinator());
     }
 
-    // Resolver para o campo 'students' do tipo 'Group'.
-    // Retorna uma lista de User (stubs) contendo apenas os IDs.
     @SchemaMapping(typeName = "GroupDTO", field = "students")
-    public List<User> students(GroupDTO groupDTO) {
-        if (groupDTO.getStudents() == null || groupDTO.getStudents().isEmpty()) {
-            return List.of();
-        }
-        return groupDTO.getStudents().stream()
-                .map(student -> new User(student.getId()))
-                .collect(Collectors.toList());
+    public List<User> students(Group group) {
+        return Optional.ofNullable(group.getStudents())
+                .map(this::convertToUsers)
+                .orElse(List.of());
+    }
+
+    private List<User> convertToUsers(List<UUID> studentIds) {
+        return studentIds.stream()
+                .map(User::new)
+                .toList();
     }
 
     @SchemaMapping(typeName = "GroupDTO", field= "id")
-    public UUID __resolveReference(GroupDTO groupDTO) {
-        return groupRepository.findById(groupDTO.getId()).get().getId();
+    public UUID __resolveReference(Group group) {
+        return groupRepository.findById(group.getId()).get().getId();
     }
 }
