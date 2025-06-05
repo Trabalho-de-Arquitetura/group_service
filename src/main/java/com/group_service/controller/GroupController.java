@@ -130,7 +130,7 @@ public class GroupController {
     }
 
     @SchemaMapping(typeName = "GroupDTO", field = "id")
-    public Optional<Group> __resolveReference(Group group) {
-        return groupRepository.findById(group.getId());
+    public Optional<Group> __resolveReference(GroupDTO groupDTO) {
+        return groupRepository.findById(groupDTO.getId());
     }
 }
