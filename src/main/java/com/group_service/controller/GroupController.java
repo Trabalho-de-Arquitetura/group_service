@@ -72,7 +72,6 @@ public class GroupController {
         group.setStudentIds(input.studentIds);
 
         Group savedGroup = groupRepository.save(group);
-        System.out.println("Group saved: " + savedGroup.getId() + ", Name: " + savedGroup.getName());
         return new GroupDTO(
                 savedGroup.getId(),
                 savedGroup.getName(),
