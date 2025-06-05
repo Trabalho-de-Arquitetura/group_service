@@ -102,11 +102,13 @@ public class GroupController {
     // Resolver para o campo 'students' do tipo 'Group'.
     // Retorna uma lista de User (stubs) contendo apenas os IDs.
     @SchemaMapping(typeName = "GroupDTO", field = "students")
-    public List<UUID> students(Group group) {
-        if (group.getStudentIds() == null) {
+    public List<User> students(Group group) {
+        if (group.getStudentIds() == null || group.getStudentIds().isEmpty()) {
             return List.of();
         }
-        return group.getStudentIds();
+        return group.getStudentIds().stream()
+            .map(User::new)
+            .collect(Collectors.toList());
     }
 
     @SchemaMapping(typeName = "GroupDTO", field = "id")
