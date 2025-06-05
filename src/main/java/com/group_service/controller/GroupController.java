@@ -1,6 +1,7 @@
 package com.group_service.controller;
 
 import com.group_service.dto.CreateGroupInput;
+import com.group_service.dto.GroupDTO;
 import com.group_service.dto.UpdateGroupInput;
 import com.group_service.dto.User;
 import com.group_service.entity.Group;
@@ -35,8 +36,16 @@ public class GroupController {
         return groupRepository.findAllById(id).stream().findFirst().orElse(null);
     }
     @QueryMapping
-    public List<Group> findAllGroups() {
-        return groupRepository.findAll();
+    public List<GroupDTO> findAllGroups() {
+        return groupRepository.findAll().stream()
+                .map(group -> new GroupDTO(
+                        group.getId(),
+                        group.getName(),
+                        group.isAvailableForProjects(),
+                        new User(group.getCoordinatorId()),
+                        group.getStudentIds().stream().map(User::new).toList()
+                ))
+                .toList();
     }
 
     @QueryMapping
@@ -55,7 +64,7 @@ public class GroupController {
     }
 
     @MutationMapping
-    public Group saveGroup(@Argument CreateGroupInput input) {
+    public GroupDTO saveGroup(@Argument CreateGroupInput input) {
         Group group = new Group();
         group.setName(input.name);
         group.setAvailableForProjects(input.availableForProjects);
@@ -64,7 +73,13 @@ public class GroupController {
 
         Group savedGroup = groupRepository.save(group);
         System.out.println("Group saved: " + savedGroup.getId() + ", Name: " + savedGroup.getName());
-        return savedGroup;
+        return new GroupDTO(
+                savedGroup.getId(),
+                savedGroup.getName(),
+                savedGroup.isAvailableForProjects(),
+                new User(savedGroup.getCoordinatorId()),
+                savedGroup.getStudentIds().stream().map(User::new).toList()
+        );
     }
     @MutationMapping
     public Group updateGroup(@Argument UpdateGroupInput input) {
