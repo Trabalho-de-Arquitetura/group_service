@@ -43,6 +43,6 @@ input UpdateGroupInput {
 
 type Mutation {
     saveGroup(input: CreateGroupInput!): GroupDTO!
-    updateGroup(input: UpdateGroupInput!): GroupDTO!ç
+    updateGroup(input: UpdateGroupInput!): GroupDTO!
     deleteGroup(id: ID!): GroupDTO!
 }
